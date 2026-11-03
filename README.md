@@ -1,4 +1,4 @@
-# SecuraPy Platform — SIEM e Plataforma de Segurança
+# SecuraPy Platform: SIEM e Plataforma de Segurança
 
 ## 1. Descrição e Objetivo
 
