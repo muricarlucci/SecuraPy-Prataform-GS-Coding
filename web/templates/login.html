@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>SecuraPy Platform — Login de Operador</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f4f6f9; color: #222; margin: 0; padding: 40px; }
+        .caixa-login { max-width: 400px; margin: 40px auto; background: #fff; padding: 25px; border: 1px solid #ccc; border-radius: 6px; }
+        h1 { font-size: 20px; margin-top: 0; color: #1a365d; }
+        label { display: block; margin-top: 12px; font-weight: bold; font-size: 14px; }
+        input[type="text"], input[type="password"] { width: 100%; padding: 8px; margin-top: 5px; box-sizing: border-box; border: 1px solid #aaa; border-radius: 4px; }
+        button { margin-top: 18px; width: 100%; padding: 10px; background-color: #1a365d; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; }
+        .erro { background-color: #fed7d7; color: #9b2c2c; padding: 10px; border-radius: 4px; margin-bottom: 12px; font-size: 14px; }
+        .link-voltar { display: block; margin-top: 15px; text-align: center; font-size: 13px; color: #2b6cb0; text-decoration: none; }
+    </style>
+</head>
+<body>
+    <div class="caixa-login">
+        <h1>SecuraPy Platform — SOC Login</h1>
+        {% if erro %}
+        <div class="erro">{{ erro }}</div>
+        {% endif %}
+        <form method="POST" action="/login">
+            <label for="usuario">Usuário ou Email:</label>
+            <input type="text" id="usuario" name="usuario" required>
+
+            <label for="senha">Senha:</label>
+            <input type="password" id="senha" name="senha" required>
+
+            <button type="submit">Entrar</button>
+        </form>
+        <a class="link-voltar" href="/">Voltar ao Dashboard</a>
+    </div>
+</body>
+</html>

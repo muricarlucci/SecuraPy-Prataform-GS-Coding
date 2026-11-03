@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>SecuraPy Platform — Análise do IP {{ dados.ip }}</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f4f6f9; color: #222; margin: 0; padding: 0; }
+        header { background-color: #1a365d; color: #fff; padding: 16px 28px; display: flex; justify-content: space-between; align-items: center; }
+        header h1 { margin: 0; font-size: 20px; }
+        header a { color: #bee3f8; text-decoration: none; font-size: 14px; }
+        .container { max-width: 1150px; margin: 20px auto; padding: 0 20px; }
+        .painel-grid { display: flex; gap: 20px; flex-wrap: wrap; margin-bottom: 20px; }
+        .card { background: #fff; border: 1px solid #d2d6dc; border-radius: 6px; padding: 16px; flex: 1; min-width: 300px; margin-bottom: 16px; }
+        .card h2 { margin-top: 0; font-size: 17px; color: #1a365d; border-bottom: 1px solid #e2e8f0; padding-bottom: 8px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 14px; }
+        th, td { border: 1px solid #cbd5e0; padding: 8px 10px; text-align: left; }
+        th { background-color: #edf2f7; }
+        .destaque-ia { background-color: #ebf8ff; border-left: 4px solid #2b6cb0; padding: 12px; margin-top: 8px; }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Relatório Completo do IP: {{ dados.ip }}</h1>
+        <a href="/">Voltar ao Dashboard Principal</a>
+    </header>
+
+    <div class="container">
+        <div class="painel-grid">
+            <div class="card">
+                <h2>Geolocalização e Rede (ipinfo.io)</h2>
+                <p><strong>IP:</strong> {{ dados.ip }} ({{ dados.tipo_ip }})</p>
+                <p><strong>Na Blacklist:</strong> {{ 'SIM' if dados.na_blacklist else 'NÃO' }}</p>
+                <p><strong>Cidade / Região:</strong> {{ dados.enriquecimento.cidade }} / {{ dados.enriquecimento.regiao }}</p>
+                <p><strong>País:</strong> {{ dados.enriquecimento.pais }}</p>
+                <p><strong>Organização:</strong> {{ dados.enriquecimento.org }}</p>
+            </div>
+
+            <div class="card">
+                <h2>Avaliação de Machine Learning</h2>
+                <p><strong>Classificação ML:</strong> {{ dados.ml.rotulo | upper }}</p>
+                <p><strong>Score de Risco:</strong> {{ dados.ml.score_risco }}% ({{ dados.ml.nivel_risco }})</p>
+                <p><strong>Falhas Auth:</strong> {{ dados.ml.features.qtd_fails_auth }}</p>
+                <p><strong>Portas Bloqueadas:</strong> {{ dados.ml.features.qtd_portas_bloqueadas }}</p>
+                <p><strong>Erros Web:</strong> {{ dados.ml.features.qtd_erros_web }}</p>
+            </div>
+
+            <div class="card">
+                <h2>Assistente IA de Triagem (LLM)</h2>
+                <p><strong>Veredito IA:</strong> {{ dados.analise_ia.classificacao }}</p>
+                <p><strong>Modo:</strong> {{ dados.analise_ia.modo }}</p>
+                <div class="destaque-ia">
+                    {{ dados.analise_ia.explicacao }}
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Alertas Associados ({{ dados.alertas | length }})</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Timestamp</th>
+                        <th>Severidade</th>
+                        <th>Regra</th>
+                        <th>Descrição</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for al in dados.alertas %}
+                    <tr>
+                        <td>{{ al.timestamp }}</td>
+                        <td>{{ al.severidade }}</td>
+                        <td>{{ al.regra or al.tipo }}</td>
+                        <td>{{ al.descricao }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="card">
+            <h2>Eventos Registrados ({{ dados.eventos | length }})</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Timestamp</th>
+                        <th>Fonte</th>
+                        <th>Tipo</th>
+                        <th>Detalhes</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for ev in dados.eventos %}
+                    <tr>
+                        <td>{{ ev.timestamp }}</td>
+                        <td>{{ ev.fonte }}</td>
+                        <td>{{ ev.tipo }}</td>
+                        <td>{{ ev.detalhes }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+</html>

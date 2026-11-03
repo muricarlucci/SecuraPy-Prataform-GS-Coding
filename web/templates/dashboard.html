@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>SecuraPy Platform — Dashboard SOC</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f4f6f9; color: #222; margin: 0; padding: 0; }
+        header { background-color: #1a365d; color: #fff; padding: 16px 28px; display: flex; justify-content: space-between; align-items: center; }
+        header h1 { margin: 0; font-size: 22px; }
+        header a { color: #bee3f8; text-decoration: none; margin-left: 15px; font-size: 14px; }
+        .container { max-width: 1180px; margin: 20px auto; padding: 0 20px; }
+        .painel-grid { display: flex; gap: 20px; flex-wrap: wrap; margin-bottom: 20px; }
+        .card { background: #fff; border: 1px solid #d2d6dc; border-radius: 6px; padding: 16px; flex: 1; min-width: 280px; }
+        .card h2 { margin-top: 0; font-size: 17px; color: #1a365d; border-bottom: 1px solid #e2e8f0; padding-bottom: 8px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 14px; }
+        th, td { border: 1px solid #cbd5e0; padding: 8px 10px; text-align: left; }
+        th { background-color: #edf2f7; }
+        .badge-CRITICA { color: #9b2c2c; font-weight: bold; }
+        .badge-ALTA { color: #c05621; font-weight: bold; }
+        .badge-MEDIA { color: #b7791f; font-weight: bold; }
+        .badge-BAIXA { color: #2b6cb0; }
+        .form-inline { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+        input[type="text"], select { padding: 7px 10px; border: 1px solid #a0aec0; border-radius: 4px; }
+        button { padding: 8px 14px; background-color: #2b6cb0; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; }
+        .aviso { background-color: #feebc8; color: #744210; padding: 10px; border-radius: 4px; margin-bottom: 16px; }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>SecuraPy Platform — SIEM &amp; SOC Dashboard</h1>
+        <div>
+            {% if operador %}
+            <span>Operador: <strong>{{ operador }}</strong></span>
+            <a href="/logout">Sair</a>
+            {% else %}
+            <a href="/login">Login de Operador</a>
+            {% endif %}
+        </div>
+    </header>
+
+    <div class="container">
+        {% if mensagem %}
+        <div class="aviso">{{ mensagem }}</div>
+        {% endif %}
+
+        <div class="painel-grid">
+            <div class="card">
+                <h2>Resumo de Eventos por Fonte</h2>
+                <table>
+                    <tr><th>Fonte</th><th>Quantidade</th></tr>
+                    <tr><td>Autenticação (auth)</td><td>{{ eventos_por_fonte.get('auth', 0) }}</td></tr>
+                    <tr><td>Firewall (firewall)</td><td>{{ eventos_por_fonte.get('firewall', 0) }}</td></tr>
+                    <tr><td>Acesso Web (web)</td><td>{{ eventos_por_fonte.get('web', 0) }}</td></tr>
+                    <tr><th>Total de Eventos</th><th>{{ total_eventos }}</th></tr>
+                </table>
+                <form method="POST" action="/analisar-web" style="margin-top: 12px;">
+                    <button type="submit">Reprocessar Logs do Projeto</button>
+                </form>
+            </div>
+
+            <div class="card">
+                <h2>Alertas por Severidade</h2>
+                <table>
+                    <tr><th>Severidade</th><th>Quantidade</th></tr>
+                    <tr><td class="badge-CRITICA">CRÍTICA</td><td>{{ alertas_por_severidade.get('CRITICA', 0) }}</td></tr>
+                    <tr><td class="badge-ALTA">ALTA</td><td>{{ alertas_por_severidade.get('ALTA', 0) }}</td></tr>
+                    <tr><td class="badge-MEDIA">MÉDIA</td><td>{{ alertas_por_severidade.get('MEDIA', 0) }}</td></tr>
+                    <tr><td class="badge-BAIXA">BAIXA</td><td>{{ alertas_por_severidade.get('BAIXA', 0) }}</td></tr>
+                    <tr><th>Total de Alertas</th><th>{{ total_alertas }}</th></tr>
+                </table>
+            </div>
+
+            <div class="card">
+                <h2>Pesquisa e Inteligência de IP</h2>
+                <form method="GET" action="/buscar-ip" class="form-inline">
+                    <input type="text" name="ip" placeholder="Ex: 185.220.101.1" required>
+                    <button type="submit">Consultar IP</button>
+                </form>
+
+                <h2 style="margin-top: 20px;">Registrar Alerta Manual</h2>
+                <form method="POST" action="/cadastrar-alerta-web">
+                    <div class="form-inline" style="margin-bottom: 8px;">
+                        <input type="text" name="tipo" placeholder="Tipo (ex: XSS)" required>
+                        <input type="text" name="ip" placeholder="IP (ex: 45.33.32.156)" required>
+                        <select name="severidade">
+                            <option value="BAIXA">BAIXA</option>
+                            <option value="MEDIA">MEDIA</option>
+                            <option value="ALTA">ALTA</option>
+                            <option value="CRITICA">CRITICA</option>
+                        </select>
+                    </div>
+                    <div class="form-inline">
+                        <input type="text" name="descricao" placeholder="Descrição do alerta" style="flex: 1;" required>
+                        <button type="submit">Registrar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="card" style="margin-bottom: 20px;">
+            <h2>Top 10 IPs Monitorados (Priorização Machine Learning)</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>IP</th>
+                        <th>Total de Eventos</th>
+                        <th>Blacklist</th>
+                        <th>Rótulo ML</th>
+                        <th>Score de Risco ML</th>
+                        <th>Nível de Risco</th>
+                        <th>Ação</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in top_10_ips %}
+                    <tr>
+                        <td><strong>{{ item.ip }}</strong></td>
+                        <td>{{ item.total }}</td>
+                        <td>{{ 'SIM' if item.na_blacklist else 'NÃO' }}</td>
+                        <td>{{ item.rotulo_ml }}</td>
+                        <td>{{ item.score_risco }}%</td>
+                        <td class="badge-{{ item.nivel_risco }}">{{ item.nivel_risco }}</td>
+                        <td><a href="/buscar-ip?ip={{ item.ip }}">Ver Detalhes</a></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="card">
+            <h2>Alertas Recentes</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Timestamp</th>
+                        <th>Severidade</th>
+                        <th>Regra / Tipo</th>
+                        <th>IP</th>
+                        <th>Score ML</th>
+                        <th>Descrição (Escapada contra XSS)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for alerta in alertas_recentes %}
+                    <tr>
+                        <td>{{ alerta.timestamp }}</td>
+                        <td class="badge-{{ alerta.severidade }}">{{ alerta.severidade }}</td>
+                        <td>{{ alerta.regra or alerta.tipo }}</td>
+                        <td><a href="/buscar-ip?ip={{ alerta.ip }}">{{ alerta.ip }}</a></td>
+                        <td>{{ alerta.score_risco_ml or 0 }}%</td>
+                        <td>{{ alerta.descricao }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+</html>

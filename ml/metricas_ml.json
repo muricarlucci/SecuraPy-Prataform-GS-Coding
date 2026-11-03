@@ -1,0 +1,38 @@
+{
+  "modelo": "Pipeline(StandardScaler + RandomForestClassifier)",
+  "features": [
+    "qtd_fails_auth",
+    "qtd_portas_bloqueadas",
+    "esta_na_blacklist",
+    "qtd_erros_web",
+    "total_eventos"
+  ],
+  "amostras_totais": 20,
+  "ips_reais_logs": 7,
+  "amostras_historico_soc": 13,
+  "observacao_metodologica": "Os 3 arquivos de log originais possuem 58 eventos distribuídos em 7 IPs únicos (4 ativos internos legítimos e 3 origens externas de ataque). Para viabilizar validação cruzada de 5 folds (cv=5) e avaliação em conjunto de teste separado (X_test) sem vazamento de dados, os 7 IPs foram combinados com 13 registros históricos do SOC rotulados de forma independente.",
+  "validacao_cruzada_5_folds": {
+    "acuracia_media": 0.95,
+    "acuracia_desvio": 0.1
+  },
+  "avaliacao_teste": {
+    "acuracia": 1.0,
+    "precisao": 1.0,
+    "recall": 1.0,
+    "f1_score": 1.0,
+    "matriz_confusao": [
+      [
+        2,
+        0
+      ],
+      [
+        0,
+        4
+      ]
+    ]
+  },
+  "integridade": {
+    "arquivo_modelo": "modelo.pkl",
+    "sha256": "43464bf6b8ef1952c18bfede203e2a4b14ed9cd1685d8f463fa3d4f78d9b956f"
+  }
+}
