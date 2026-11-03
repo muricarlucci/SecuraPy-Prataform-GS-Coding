@@ -1,0 +1,74 @@
+services:
+  mongodb:
+    image: mongo:7
+    container_name: securapy_mongo
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 15s
+    networks:
+      - securapy_net
+
+  mysql:
+    image: mysql:8.0-debian
+    container_name: securapy_mysql
+    restart: unless-stopped
+    command: --performance-schema=OFF --innodb-buffer-pool-size=32M
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./db/schema.sql:/docker-entrypoint-initdb.d/schema.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -u root -p$$MYSQL_ROOT_PASSWORD"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
+    networks:
+      - securapy_net
+
+  api:
+    build: .
+    container_name: securapy_api
+    restart: unless-stopped
+    depends_on:
+      mongodb:
+        condition: service_healthy
+      mysql:
+        condition: service_healthy
+    env_file:
+      - .env
+    environment:
+      MONGO_URI: mongodb://mongodb:27017/
+      MONGO_DB: ${MONGO_DB}
+      MYSQL_HOST: mysql
+      MYSQL_PORT: "3306"
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      SECURAPY_API_TOKEN: ${SECURAPY_API_TOKEN}
+      PORT: "5000"
+    ports:
+      - "5000:5000"
+      - "9999:9999"
+    networks:
+      - securapy_net
+
+volumes:
+  mongo_data:
+  mysql_data:
+
+networks:
+  securapy_net:
+    driver: bridge
