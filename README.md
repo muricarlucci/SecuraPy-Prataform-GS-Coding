@@ -233,7 +233,7 @@ python testar_plataforma.py
 
 | Papel na Equipe | Módulos sob Responsabilidade |
 |-----------------|------------------------------|
-| **Integrante 1 (Núcleo e Bancos)** | Módulo A (Coletor, Regras, Detector, Enriquecimento, Alertas TCP) e Módulo B (Persistência MongoDB e MySQL) |
-| **Integrante 2 (Machine Learning)** | Módulo C (Extração de Features, Pipeline StandardScaler + RandomForest, Métricas, IsolationForest e SHA-256) |
-| **Integrante 3 (API REST e Docker)** | Módulo D (Endpoints REST Flask, Paginação, Autenticação Bearer/RBAC) e Módulo F (Dockerfile, Docker Compose e SDK) |
-| **Integrante 4 (Segurança Web e IA)** | Módulo E (Dashboard Web, Proteção XSS, Headers OWASP, Access Log), Módulo G (Assistente LLM e Anti-Injection) e Integração |
+| **Murilo Carlucci (Núcleo e Bancos)** | Módulo A (Coletor, Regras, Detector, Enriquecimento, Alertas TCP) e Módulo B (Persistência MongoDB e MySQL) |
+| **Miguell Junquira (Machine Learning)** | Módulo C (Extração de Features, Pipeline StandardScaler + RandomForest, Métricas, IsolationForest e SHA-256) |
+| **Guilherme Mendonça (API REST e Docker)** | Módulo D (Endpoints REST Flask, Paginação, Autenticação Bearer/RBAC) e Módulo F (Dockerfile, Docker Compose e SDK) |
+| **Murilo e Miguell (Segurança Web e IA)** | Módulo E (Dashboard Web, Proteção XSS, Headers OWASP, Access Log), Módulo G (Assistente LLM e Anti-Injection) e Integração |
